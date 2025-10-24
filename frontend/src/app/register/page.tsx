@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import RegisterForm from '../../components/Auth/RegisterForm';
+import RegisterForm from '../../components/RegisterForm';
 import Link from 'next/link';
 
 export default function RegisterPage() {

@@ -1,0 +1,113 @@
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../utils/supabaseClient';
+import { Item } from '../types/Item';
+
+export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () => void}) {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'AED',
+    }).format(price);
+  };
+
+  const handleClick = () => {
+    router.push(`/item/${item.id}`);
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/admin/${item.id}/edit`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!confirm('Are you sure you want to delete this plant? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('item_alba')
+        .delete()
+        .eq('id', item.id);
+
+      if (error) throw error;
+
+      if (onDelete) onDelete();
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      alert('Failed to delete plant. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer relative"
+      onClick={handleClick}
+    >
+      <div className="relative w-full h-60 overflow-hidden">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 truncate">
+            {item.name}
+          </h3>
+          <span className="text-lg font-bold text-green-900">
+            {formatPrice(item.price)}
+          </span>
+        </div>
+        
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+          {item.description}
+        </p>
+        
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <span className="text-sm text-gray-500">Quantity:</span>
+            <span className="ml-2 text-sm font-medium text-gray-900">
+              {item.quantity}
+            </span>
+          </div>
+          
+          {user?.role === 'admin' && (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleEdit}
+                className="text-white px-2 py-1 rounded text-xs hover:bg-blue-200 hover:cursor-pointer transition-colors"
+                title="Edit plant"
+              >
+                ✏️
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="text-white px-2 py-1 rounded text-xs hover:bg-red-200 hover:cursor-pointer transition-colors disabled:opacity-50"
+                title="Delete plant"
+              >
+                {isDeleting ? '⏳' : '🗑️'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

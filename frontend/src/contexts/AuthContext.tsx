@@ -68,11 +68,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       password,
     });
     if (error) throw error;
+    const { data: userData } = await supabase.from("user_alba").select("*").eq("id", data.user.id).single();
+    if (!userData) throw new Error('User not found');
+    
     setUser({
       id: data.user.id,
       email: data.user.email || '',
-      name: data.user.user_metadata?.name || '',
-      role: data.user.role || 'USER',
+      name: userData?.name || '',
+      role: userData?.role,
     });
     setToken(data.session.access_token);
     localStorage.setItem('token', data.session.access_token);
@@ -88,6 +91,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
     if (error) throw error;
     if (!data.user) throw new Error('Failed to create user');
+
+    const { error: insertError } = await supabase.from("user_alba").insert({
+      id: data.user.id,
+      name : name || '',
+    });
+
+    if (insertError) throw insertError;
+
     setUser({
       id: data.user.id || '',
       email: data.user.email || '',
