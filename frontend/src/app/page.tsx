@@ -1,11 +1,10 @@
-import Image from "next/image";
-import { useState } from 'react';
+'use client';
+
+import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
-import AuthModal from '../components/Auth/AuthModal';
 
 export default function Home() {
   const { user, logout, loading } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
 
   if (loading) {
     return (
@@ -37,12 +36,20 @@ export default function Home() {
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => setShowAuthModal(true)}
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-                >
-                  Login / Register
-                </button>
+                <div className="flex space-x-2">
+                  <Link
+                    href="/login"
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+                  >
+                    Register
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -66,12 +73,6 @@ export default function Home() {
           </div>
         </div>
       </main>
-
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)}
-        onSuccess={() => setShowAuthModal(false)}
-      />
     </div>
   );
 }
