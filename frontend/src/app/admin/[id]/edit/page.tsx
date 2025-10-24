@@ -6,6 +6,7 @@ import { useAuth } from '../../../../contexts/AuthContext';
 import Link from 'next/link';
 import { supabase } from '../../../../utils/supabaseClient';
 import { Item } from '../../../../types/Item';
+import UserAvatar from '@/components/UserAvatar';
 
 export default function EditItemPage() {
   const { user, loading } = useAuth();
@@ -157,9 +158,7 @@ export default function EditItemPage() {
               </Link>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                Welcome {user?.name || ''}!
-              </span>
+              <UserAvatar />
               <Link
                 href="/"
                 className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
