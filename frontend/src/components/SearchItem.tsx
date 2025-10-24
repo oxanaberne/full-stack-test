@@ -4,7 +4,7 @@ import { Item } from "../types/Item";
 import ItemCard from "./ItemCard";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function SearchItem({ items }: {items: Item[]}) {
+export default function SearchItem({ items, onDelete }: {items: Item[], onDelete?: () => void}) {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +67,7 @@ export default function SearchItem({ items }: {items: Item[]}) {
           <>
             <div className="grid grid-cols-5 gap-4 flex justify-center items-center">
               {currentItems.map((item) => (
-                <ItemCard key={item.id} item={item} />
+                <ItemCard key={item.id} item={item} onDelete={onDelete} />
               ))}
             </div>
             

@@ -125,7 +125,7 @@ export default function Home() {
                   </button>
                 </div>
               ) : (
-                <SearchItem items={plants} />
+                <SearchItem items={plants} onDelete={fetchPlants} />
               )}
             </>
           )}
