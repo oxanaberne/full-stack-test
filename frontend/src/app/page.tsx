@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
+import { mockItems } from '../data/mockItems';
+import SearchItem from '../components/SearchItem';
 
 export default function Home() {
   const { user, logout, loading } = useAuth();
@@ -58,19 +60,24 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {user ? `Welcome back, ${user.name}!` : 'Welcome to Alb\'s App'}
-              </h2>
-              <p className="text-gray-600 mb-4">
-                {user 
-                  ? `You are logged in.`
-                  : 'Please login or register to access the application features.'
-                }
-              </p>
-            </div>
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {user ? `Welcome back, ${user.name}!` : 'Welcome to Alb\'s App'}
+            </h2>
+            {user && (<p className="text-gray-600"> Browse our collection of beautiful plants or search for a specific plant <span className="text-3xl">🪴</span></p>)}
           </div>
+
+          {user && <SearchItem items={mockItems} />}
+
+          {!user && (
+            <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
+              <div className="text-center">
+                <p className="text-gray-600 mb-4">
+                  Please login or register to access the application features.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
