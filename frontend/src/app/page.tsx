@@ -1,12 +1,53 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { mockItems } from '../data/mockItems';
+import { supabase } from '../utils/supabaseClient';
+import { Item } from '../types/Item';
 import SearchItem from '../components/SearchItem';
 
 export default function Home() {
   const { user, logout, loading } = useAuth();
+  const [plants, setPlants] = useState<Item[]>([]);
+  const [plantsLoading, setPlantsLoading] = useState(true);
+  const [plantsError, setPlantsError] = useState('');
+
+  const fetchPlants = async () => {
+    try {
+      setPlantsLoading(true);
+      setPlantsError('');
+      
+      const { data, error } = await supabase
+        .from('item_alba')
+        .select('*')
+        .order('quantity', { ascending: true });
+
+      if (error) throw error;
+
+      setPlants(data || []);
+    } catch (error) {
+      console.error('Error fetching plants:', error);
+      setPlantsError('Failed to load plants. Please try again.');
+    } finally {
+      setPlantsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) fetchPlants();
+  }, [user]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user) {
+        fetchPlants();
+      }
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [user]);
 
   if (loading) {
     return (
@@ -28,7 +69,7 @@ export default function Home() {
               {user ? (
                 <>
                   <span className="text-sm text-gray-700">
-                    Welcome, {user.name}
+                    Welcome {user.name}!
                   </span>
                   <button
                     onClick={logout}
@@ -67,7 +108,27 @@ export default function Home() {
             {user && (<p className="text-gray-600"> Browse our collection of beautiful plants or search for a specific plant <span className="text-3xl">🪴</span></p>)}
           </div>
 
-          {user && <SearchItem items={mockItems} />}
+          {user && (
+            <>
+              {plantsLoading ? (
+                <div className="text-center py-8">
+                  <div className="text-lg">Loading plants...</div>
+                </div>
+              ) : plantsError ? (
+                <div className="text-center py-8">
+                  <div className="text-red-600 mb-4">{plantsError}</div>
+                  <button
+                    onClick={fetchPlants}
+                    className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : (
+                <SearchItem items={plants} />
+              )}
+            </>
+          )}
 
           {!user && (
             <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">

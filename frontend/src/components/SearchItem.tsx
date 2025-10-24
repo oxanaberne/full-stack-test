@@ -1,11 +1,15 @@
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Item } from "../types/Item";
 import ItemCard from "./ItemCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SearchItem({ items }: {items: Item[]}) {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const router = useRouter();
 
   const filteredItems = useMemo(() => {
     if (!searchTerm.trim())
@@ -39,9 +43,26 @@ export default function SearchItem({ items }: {items: Item[]}) {
       </div>
 
       <div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">
-          {searchTerm ? `Search Results (${filteredItems.length} found)` : 'Our Plant Collection'}
-        </h3>
+        {searchTerm ? (
+          <h3 className="text-xl font-semibold text-gray-900 mb-6">
+            Search Results ({filteredItems.length} found)
+          </h3>
+        ) : (
+          <div className="flex justify-between items-start ">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              Our Plant Collection
+            </h3>
+            {user?.role === 'admin' && (
+              <button 
+                onClick={() => router.push('/admin/new')}
+                className="bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-emerald-800 hover:cursor-pointer"
+              >
+                Add Plant
+              </button>
+            )}
+          </div>
+        )}
+
         {currentItems.length > 0 ? (
           <>
             <div className="grid grid-cols-5 gap-4 flex justify-center items-center">

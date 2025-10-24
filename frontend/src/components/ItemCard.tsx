@@ -52,17 +52,6 @@ export default function ItemCard({ item }: ItemCardProps) {
             {item.quantity}
           </span>
         </div>
-        
-        <div className="border-t pt-4 text-xs text-gray-500">
-            <span className="flex justify-between items-start ">
-                <span>Created by:</span>
-                <span className="font-bold">{item.created_by}</span>
-            </span>
-            <span className="flex justify-between items-start ">
-                <span>Created on the:</span>
-                <span className="font-bold">{formatDate(item.created_at)}</span>
-            </span>
-        </div>
       </div>
     </div>
   );
