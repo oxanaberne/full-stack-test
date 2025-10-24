@@ -6,5 +6,5 @@ export interface Item {
   quantity: number;
   price: number;
   created_by: string;
-  created_at: string;
+  timestamp: string;
 }

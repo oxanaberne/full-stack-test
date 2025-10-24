@@ -1,19 +1,10 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Item } from '../types/Item';
 
-interface ItemCardProps {
-  item: Item;
-}
-
-export default function ItemCard({ item }: ItemCardProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+export default function ItemCard({ item }: {item: Item }) {
+  const router = useRouter();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -22,8 +13,15 @@ export default function ItemCard({ item }: ItemCardProps) {
     }).format(price);
   };
 
+  const handleClick = () => {
+    router.push(`/item/${item.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+    <div 
+      className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+      onClick={handleClick}
+    >
       <div className="relative w-full h-60 overflow-hidden">
         <img
           src={item.image}
