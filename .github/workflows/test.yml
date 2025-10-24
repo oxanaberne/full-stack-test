@@ -1,0 +1,24 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main, feature ]
+  pull_request:
+    branches: [ main, feature ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '24'
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test
