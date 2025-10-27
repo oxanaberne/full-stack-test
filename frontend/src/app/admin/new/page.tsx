@@ -2,22 +2,23 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { supabase } from '@/utils/supabaseClient';
 import UserAvatar from '@/components/UserAvatar';
+import { useCreateItem } from '@/hooks/useCreateItem';
 
 export default function AddNewItemPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const createItemMutation = useCreateItem();
+  const [error, setError] = useState('');
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     quantity: 0,
     price: 0,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
@@ -48,20 +49,20 @@ export default function AddNewItemPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
+
+    if (!user) return;
 
     try {
       const randomImageUrl = getRandomImage();
-      const { error } = await supabase.from("item_alba").insert({
+      await createItemMutation.mutateAsync({
         name: formData.name,
         description: formData.description,
         image: randomImageUrl,
         quantity: formData.quantity,
         price: formData.price,
-        created_by: user?.id || '',
+        created_by: user.id,
       });
-      if (error) throw error;
 
       setFormData({
         name: '',
@@ -72,8 +73,6 @@ export default function AddNewItemPage() {
       router.push('/');
     } catch (err) {
       setError('Failed to create item. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -194,10 +193,10 @@ export default function AddNewItemPage() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={createItemMutation.isPending}
                   className="px-4 py-2 bg-emerald-700 text-white rounded-md hover:cursor-pointer hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Creating...' : 'Create Plant'}
+                  {createItemMutation.isPending ? 'Creating...' : 'Create Plant'}
                 </button>
               </div>
             </form>

@@ -2,26 +2,28 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../../../contexts/AuthContext';
+import { useParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
-import { supabase } from '../../../../utils/supabaseClient';
-import { Item } from '../../../../types/Item';
 import UserAvatar from '@/components/UserAvatar';
+import { useItem } from '@/hooks/useItem';
+import { useUpdateItem } from '@/hooks/useUpdateItem';
 
 export default function EditItemPage() {
-  const { user, loading } = useAuth();
+  const params = useParams();
   const router = useRouter();
-  const [item, setItem] = useState<Item | null>(null);
+  const updateItemMutation = useUpdateItem();
+  const { user, loading } = useAuth();
+  const { data: item, isLoading: itemLoading, error: itemError } = useItem(params.id);
+  const [error, setError] = useState('');
+  
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     quantity: 0,
     price: 0,
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-
+  
   useEffect(() => {
     if (!loading && (!user || user.role !== 'admin')) {
       router.push('/');
@@ -29,43 +31,17 @@ export default function EditItemPage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    const fetchItem = async () => {
-      try {
-        setIsLoading(true);
-        setError('');
-
-        const pathParts = window.location.pathname.split('/');
-        const itemId = pathParts[pathParts.length - 2];
-
-        const { data, error } = await supabase
-          .from('item_alba')
-          .select('*')
-          .eq('id', itemId)
-          .single();
-
-        if (error) throw error;
-
-        setItem(data);
-        setFormData({
-          name: data.name,
-          description: data.description,
-          quantity: data.quantity,
-          price: data.price,
-        });
-      } catch (err) {
-        console.error('Error fetching item:', err);
-        setError('Item not found or failed to load.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user && user.role === 'admin') {
-      fetchItem();
+    if (item) {
+      setFormData({
+        name: item.name,
+        description: item.description,
+        quantity: item.quantity,
+        price: item.price,
+      });
     }
-  }, [user]);
+  }, [item]);
 
-  if (loading || isLoading) {
+  if (loading || itemLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -73,7 +49,7 @@ export default function EditItemPage() {
     );
   }
 
-  if (error || !item) {
+  if (itemError || !item) {
     return (
       <div className="min-h-screen bg-gray-50">
         <nav className="bg-white shadow-sm">
@@ -99,7 +75,7 @@ export default function EditItemPage() {
         <main className="max-w-2xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="text-center py-8">
-              <div className="text-red-600 mb-4">{error}</div>
+              <div className="text-red-600 mb-4">Item not found or failed to load.</div>
               <Link
                 href="/"
                 className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
@@ -123,27 +99,22 @@ export default function EditItemPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError('');
 
-    try {
-      const { error } = await supabase
-        .from('item_alba')
-        .update({
-          name: formData.name,
-          description: formData.description,
-          quantity: formData.quantity,
-          price: formData.price,
-        })
-        .eq('id', item.id);
+    if (!item) return;
 
-      if (error) throw error;
+    try {
+      await updateItemMutation.mutateAsync({
+        id: item.id,
+        name: formData.name,
+        description: formData.description,
+        quantity: formData.quantity,
+        price: formData.price,
+      });
 
       router.push('/');
     } catch (err) {
       setError('Failed to update item. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -264,10 +235,10 @@ export default function EditItemPage() {
                 </Link>
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={updateItemMutation.isPending}
                   className="px-4 py-2 bg-emerald-700 text-white rounded-md hover:cursor-pointer hover:bg-emerald-800 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Updating...' : 'Update Plant'}
+                  {updateItemMutation.isPending ? 'Updating...' : 'Update Plant'}
                 </button>
               </div>
             </form>

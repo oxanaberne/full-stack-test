@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Item } from "../types/Item";
+import { Item } from "@/types/Item";
 import ItemCard from "./ItemCard";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -67,7 +67,7 @@ export default function SearchItem({ items, onDelete }: {items: Item[], onDelete
           <>
             <div className="grid grid-cols-5 gap-4 flex justify-center items-center">
               {currentItems.map((item) => (
-                <ItemCard key={item.id} item={item} onDelete={onDelete} />
+                <ItemCard key={item.id} item={item} />
               ))}
             </div>
             

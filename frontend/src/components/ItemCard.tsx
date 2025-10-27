@@ -1,15 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../utils/supabaseClient';
-import { Item } from '../types/Item';
+import { useAuth } from '@/contexts/AuthContext';
+import { Item } from '@/types/Item';
+import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () => void}) {
   const router = useRouter();
   const { user } = useAuth();
-  const [isDeleting, setIsDeleting] = useState(false);
+  const deleteItemMutation = useDeleteItem();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -35,20 +34,11 @@ export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () 
     }
 
     try {
-      setIsDeleting(true);
-      const { error } = await supabase
-        .from('item_alba')
-        .delete()
-        .eq('id', item.id);
-
-      if (error) throw error;
-
+      await deleteItemMutation.mutateAsync(item.id);
       if (onDelete) onDelete();
     } catch (error) {
       console.error('Error deleting item:', error);
       alert('Failed to delete plant. Please try again.');
-    } finally {
-      setIsDeleting(false);
     }
   };
 
@@ -98,11 +88,11 @@ export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () 
               </button>
               <button
                 onClick={handleDelete}
-                disabled={isDeleting}
+                disabled={deleteItemMutation.isPending}
                 className="text-white px-2 py-1 rounded text-xs hover:bg-red-200 hover:cursor-pointer transition-colors disabled:opacity-50"
                 title="Delete plant"
               >
-                {isDeleting ? '⏳' : '🗑️'}
+                {deleteItemMutation.isPending ? '⏳' : '🗑️'}
               </button>
             </div>
           )}

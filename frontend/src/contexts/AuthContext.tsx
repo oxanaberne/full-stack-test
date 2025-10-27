@@ -1,14 +1,7 @@
 'use client';
 
-import { supabase } from '@/utils/supabaseClient';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import { useCurrentUser, useLogin, useRegister, useLogout, User } from '../hooks/useAuth';
 
 interface AuthContextType {
   user: User | null;
@@ -22,101 +15,36 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: user, isLoading: userLoading } = useCurrentUser();
+  const loginMutation = useLogin();
+  const registerMutation = useRegister();
+  const logoutMutation = useLogout();
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (storedToken) {
-        setToken(storedToken);
-        await fetchUser();
-      } else {
-        setLoading(false);
-      }
-    };
-    
-    initializeAuth();
-  }, []);
-
-
-  const fetchUser = async () => {
-    try {
-      const { data } = await supabase.auth.getUser();
-      if (data.user) {
-        setUser({
-          id: data.user.id,
-          email: data.user.email || '',
-          name: data.user.user_metadata?.name || '',
-          role: data.user.user_metadata?.role || 'USER',
-        });
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      localStorage.removeItem('token');
-      setToken(null);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    const { data: userData } = await supabase.from("user_alba").select("*").eq("id", data.user.id).single();
-    if (!userData) throw new Error('User not found');
-    
-    setUser({
-      id: data.user.id,
-      email: data.user.email || '',
-      name: userData?.name || '',
-      role: userData?.role,
-    });
-    setToken(data.session.access_token);
-    localStorage.setItem('token', data.session.access_token);
+    await loginMutation.mutateAsync({ email, password });
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-      },
-    });
-    if (error) throw error;
-    if (!data.user) throw new Error('Failed to create user');
-
-    const { error: insertError } = await supabase.from("user_alba").insert({
-      id: data.user.id,
-      name : name || '',
-    });
-
-    if (insertError) throw insertError;
-
-    setUser({
-      id: data.user.id || '',
-      email: data.user.email || '',
-      name: data.user.user_metadata?.name || '',
-      role: data.user.user_metadata?.role || 'USER',
-    });
-    setToken(data.session?.access_token || '');
-    localStorage.setItem('token', data.session?.access_token || '');
+    await registerMutation.mutateAsync({ name, email, password });
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
+    logoutMutation.mutate();
   };
 
+  const loading = userLoading || loginMutation.isPending || registerMutation.isPending || logoutMutation.isPending;
+
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ 
+      user: user || null, 
+      token, 
+      login, 
+      register, 
+      logout, 
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

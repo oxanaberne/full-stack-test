@@ -1,44 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '../../../utils/supabaseClient';
-import { Item } from '../../../types/Item';
+import { useItem } from '@/hooks/useItem';
 
 export default function ItemDetailsPage() {
   const params = useParams();
-  const [item, setItem] = useState<Item | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchItem = async () => {
-      try {
-        setLoading(true);
-        setError('');
-
-        const { data, error } = await supabase
-          .from('item_alba')
-          .select('*')
-          .eq('id', params.id)
-          .single();
-
-        if (error) throw error;
-
-        setItem(data);
-      } catch (err) {
-        console.error('Error fetching item:', err);
-        setError('Item not found or failed to load.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (params.id) {
-      fetchItem();
-    }
-  }, [params.id]);
+  const { data: item, isLoading: loading, error } = useItem(params.id);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -117,7 +85,7 @@ export default function ItemDetailsPage() {
         <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
           <div className="px-4 py-6 sm:px-0">
             <div className="text-center py-8">
-              <div className="text-red-600 mb-4">{error}</div>
+              <div className="text-red-600 mb-4">Item not found or failed to load.</div>
               <Link
                 href="/"
                 className="bg-emerald-600 text-white px-4 py-2 rounded-md hover:bg-emerald-700"
