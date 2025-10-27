@@ -56,18 +56,12 @@ export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () 
       </div>
       
       <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-semibold text-gray-900 truncate">
-            {item.name}
-          </h3>
-          <span className="text-lg font-bold text-green-900">
+        <h3 className="text-lg font-semibold text-gray-900 truncate">
+          {item.name}
+        </h3>
+        <span className="text-md font-bold text-green-900">
             {formatPrice(item.price)}
-          </span>
-        </div>
-        
-        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-          {item.description}
-        </p>
+        </span>
         
         <div className="flex items-center justify-between">
           <div className="flex items-center">
