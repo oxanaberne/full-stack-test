@@ -8,9 +8,7 @@ export interface User {
   role: string;
 }
 
-export const useCurrentUser = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
+export const useCurrentUser = () => {  
   return useQuery({
     queryKey: ['currentUser'],
     queryFn: async (): Promise<User | null> => {
@@ -30,7 +28,6 @@ export const useCurrentUser = () => {
         role: userData?.role || data.user.user_metadata?.role || 'USER',
       };
     },
-    enabled: !!token,
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
