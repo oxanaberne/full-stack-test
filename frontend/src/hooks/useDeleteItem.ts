@@ -1,23 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../utils/supabaseClient';
+import { useMutation } from "@tanstack/react-query";
+import { deleteItem } from "@/actions/deleteItem";
 
-export const useDeleteItem = () => {
-  const queryClient = useQueryClient();
-
+export function useDeleteItem() {
   return useMutation({
-    mutationFn: async (itemId: string): Promise<void> => {
-      const { error } = await supabase
-        .from('item_alba')
-        .delete()
-        .eq('id', itemId);
-
-      if (error) throw error;
-    },
-    onSuccess: (_, itemId) => {
-      // Invalidate and refetch plants list
-      queryClient.invalidateQueries({ queryKey: ['plants'] });
-      // Remove the specific item from cache
-      queryClient.removeQueries({ queryKey: ['item', itemId] });
-    },
+    mutationFn: (itemId: string) => deleteItem(itemId),
   });
-};
+}

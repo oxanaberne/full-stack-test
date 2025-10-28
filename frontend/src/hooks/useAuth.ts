@@ -40,35 +40,11 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: async ({ email, password }: { email: string; password: string }) => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-
-      const { data: userData } = await supabase
-        .from('user_alba')
-        .select('*')
-        .eq('id', data.user.id)
-        .single();
-
-      if (!userData) throw new Error('User not found');
-
-      const user: User = {
-        id: data.user.id,
-        email: data.user.email || '',
-        name: userData.name || '',
-        role: userData.role,
-      };
-
-      return {
-        user,
-        token: data.session.access_token,
-      };
+      await supabase.auth.signInWithPassword({ email, password });
+      return true;
     },
-    onSuccess: (data) => {
-      localStorage.setItem('token', data.token);
-      queryClient.setQueryData(['currentUser'], data.user);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['currentUser'] });
     },
   });
 };

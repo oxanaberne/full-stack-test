@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Item } from '@/types/Item';
+import { Item } from '@/utils/models';
 import { useDeleteItem } from '@/hooks/useDeleteItem';
 
 export default function ItemCard({ item, onDelete }: {item: Item, onDelete?: () => void}) {

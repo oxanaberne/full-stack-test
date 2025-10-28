@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import SearchItem from '../src/components/SearchItem';
 import '@testing-library/jest-dom';
 import { describe, it, expect } from '@jest/globals';
-import { Item } from '../src/types/Item';
+import { Item } from '@/utils/models';
 import { AuthProvider } from '../src/contexts/AuthContext';
 import { ReactNode } from 'react';
 
@@ -11,16 +11,6 @@ jest.mock('next/navigation', () => ({
         push: jest.fn()
     })
 }));
-
-const localStorageMock = {
-    getItem: jest.fn(),
-    setItem: jest.fn(),
-    removeItem: jest.fn(),
-    clear: jest.fn(),
-};
-Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
-});
 
 // Mock Supabase
 jest.mock('../src/utils/supabaseClient', () => ({
@@ -43,9 +33,8 @@ jest.mock('../src/utils/supabaseClient', () => ({
     }
 }));
 
-const TestWrapper = ({ children }: { children: ReactNode }) => {
-    localStorageMock.getItem.mockReturnValue('mock-token');
-    return <AuthProvider>{children}</AuthProvider>;
+const TestWrapper = ({ children, initialUser }: { children: ReactNode, initialUser: any }) => {
+    return <AuthProvider initialUser={initialUser}>{children}</AuthProvider>;
 };
 
 export const mockItems: Item[] = [
@@ -57,7 +46,7 @@ export const mockItems: Item[] = [
       quantity: 1,
       price: 1,
       created_by: 'mockUser',
-      created_at: '2025-01-01T10:00:00Z',
+      timestamp: '2025-01-01T10:00:00Z',
     },
 ];
 
@@ -65,7 +54,7 @@ describe('SearchItem', () => {
   it('renders search input', async () => {
     await act(async () => {
       render(
-        <TestWrapper>
+        <TestWrapper initialUser={undefined}>
           <SearchItem items={[]} />
         </TestWrapper>
       );
@@ -82,7 +71,7 @@ describe('SearchItem', () => {
   it('renders search results', async () => {
     await act(async () => {
       render(
-        <TestWrapper>
+        <TestWrapper initialUser={null}>
           <SearchItem items={mockItems} />
         </TestWrapper>
       );

@@ -1,10 +1,15 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Item } from "@/types/Item";
+import { Item } from "@/utils/models";
 import ItemCard from "./ItemCard";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function SearchItem({ items, onDelete }: {items: Item[], onDelete?: () => void}) {
+export interface SearchItemProps {
+  items: Item[];
+  onDelete?: () => void;
+}
+
+export default function SearchItem({ items, onDelete }: SearchItemProps) {
   const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
