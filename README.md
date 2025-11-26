@@ -3,13 +3,13 @@ A full-stack inventory management application for plant collections built with N
 
 Deployed link : https://full-stack-test-oxana-berne.vercel.app/
   
-  
-<ins>Admin account:</ins>
-**email**: [admin@gmail.com]  
+
+<ins>Admin account:</ins>  
+**email**: `admin@gmail.com`  
 **password**: admin1
 
-<ins>User account:</ins>
-**email**: [user@gmail.com]  
+<ins>User account:</ins>  
+**email**: `user@gmail.com`  
 **password**: user01
 
 <ins>Goal of Assessment:</ins> Build a small inventory-style web app that demonstrates full-stack skills using Next.js + React (TypeScript) for the frontend and a managed Supabase backend for speed. 
