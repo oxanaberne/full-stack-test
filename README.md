@@ -4,11 +4,11 @@ A full-stack inventory management application for plant collections built with N
 Deployed link : https://full-stack-test-oxana-berne.vercel.app/
   
 
-<ins>Admin account:</ins>  
+<ins>Admin account credentials:</ins>  
 **email**: `admin@gmail.com`  
 **password**: admin1
 
-<ins>User account:</ins>  
+<ins>User account creadentials:</ins>  
 **email**: `user@gmail.com`  
 **password**: user01
 
