@@ -1,16 +1,21 @@
-# Plant Collection App
+# Plant Collection App - 1 Day Assessment
 A full-stack inventory management application for plant collections built with Next.js, TypeScript, and Supabase.
 
 Deployed link : https://full-stack-test-oxana-berne.vercel.app/
 
-## Submission checklist (put this in the repo root)
+<ins>Admin account:</ins>
 
-- [ ] Public repo URL
-- [ ] `README.md` with run instructions (this file)
-- [ ] `.env.example`
-- [ ] `NOTES.md` describing tradeoffs and known limitations
-- [ ] At least one automated test
-- [ ] Clear commit history (small, focused commits)
+**email**: admin@gmail.com
+**password**: admin1
+
+<ins>User account:</ins>
+
+**email**: user@gmail.com
+**password**: user01
+
+<ins>Goal of Assessment:</ins> Build a small inventory-style web app that demonstrates full-stack skills using Next.js + React (TypeScript) for the frontend and a managed Supabase backend for speed. 
+
+This project has been done in 1 working day (6–10 hours)
 
 ## Features
 
@@ -31,6 +36,31 @@ Deployed link : https://full-stack-test-oxana-berne.vercel.app/
 - Node.js 18+
 - npm or yarn
 - Supabase account
+
+## Key Pages
+
+- **`/`** - Main plant collection with search and pagination
+- **`/item/[id]`** - Individual plant details (public access)
+- **`/admin/new`** - Create new plant (admin only)
+- **`/admin/[id]/edit`** - Edit plant (admin only)
+- **`/login`** - User login
+- **`/register`** - User registration
+
+## Admin Features
+- Create new plants
+- Edit existing plants
+- Delete plants
+
+## User Features
+- Browse plant collection
+- Search plants by name
+- View detailed plant information
+
+## Notes
+- Plant images are randomly assigned from `/public/images/` directory
+- User avatars are generated deterministically based on user ID
+- All admin operations require authentication and admin role
+- The app uses Supabase for all backend functionality
 
 ## Environment Variables
 
@@ -82,28 +112,3 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```bash
 npm run test
 ```
-
-## Key Pages
-
-- **`/`** - Main plant collection with search and pagination
-- **`/item/[id]`** - Individual plant details (public access)
-- **`/admin/new`** - Create new plant (admin only)
-- **`/admin/[id]/edit`** - Edit plant (admin only)
-- **`/login`** - User login
-- **`/register`** - User registration
-
-## Admin Features
-- Create new plants
-- Edit existing plants
-- Delete plants
-
-## User Features
-- Browse plant collection
-- Search plants by name
-- View detailed plant information
-
-## Notes
-- Plant images are randomly assigned from `/public/images/` directory
-- User avatars are generated deterministically based on user ID
-- All admin operations require authentication and admin role
-- The app uses Supabase for all backend functionality
